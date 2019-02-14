@@ -16,15 +16,15 @@ double calcularPi(int UT){
 		else{
 			sum += 1.0/(2*i+1);
 		}
+
 	}
+	return sum*4;
 }
 
 int main(){
-	double countt=calcularPi(10000);
+	double countt=calcularPi(99999999);
 	
-	std:: cout<< std::setprecision(15)<<(4*countt) << std::endl;
+	std:: cout<< std::setprecision(15)<<(countt) << std::endl;
 	return 0;
 
 }
-
-
