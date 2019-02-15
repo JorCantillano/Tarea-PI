@@ -2,7 +2,7 @@
 #include <iostream>
 #include <math.h>
 #include <iomanip>
-
+#include <pthread.h>
 
 double calcularPi(int UT){
 	//UT: Unidad de trabajo
@@ -22,7 +22,11 @@ double calcularPi(int UT){
 }
 
 int main(){
-	double countt=calcularPi(99999999);
+	int UT;
+	std:: cout<< "Ingrese la cantidad de Unidades de trabajo:";
+	std:: cin >> UT;
+	std:: cout << "\n";
+	double countt=calcularPi(UT);
 	
 	std:: cout<< std::setprecision(15)<<(countt) << std::endl;
 	return 0;
