@@ -1,31 +1,33 @@
-#include <iostream>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include  <unistd.h>
 #include <pthread.h>
 
-using namespace std;
-
-#define NUM_THREADS 5
-
-void *PrintHello(void *threadid) {
-   long tid;
-   tid = (long)threadid;
-   cout << "Hello World! Thread ID, " << tid << endl;
-   pthread_exit(NULL);
+void * hola ( void * arg ) {
+char * msg = " Hola " ;
+int i ;
+for ( i = 0 ; i < strlen ( msg ) ; i ++ ) {
+printf ( " %c " , msg [ i ]) ;
+fflush ( stdout ) ;
+usleep (1000000) ;
 }
-
-int main () {
-   pthread_t threads[NUM_THREADS];
-   int rc;
-   int i;
-   
-   for( i = 0; i < NUM_THREADS; i++ ) {
-      cout << "main() : creating thread, " << i << endl;
-      rc = pthread_create(&threads[i], NULL, PrintHello, (void *)i);
-      
-      if (rc) {
-         cout << "Error:unable to create thread," << rc << endl;
-         exit(-1);
-      }
-   }
-   pthread_exit(NULL);
+return NULL ;
+}
+void * mundo ( void * arg ) {
+char * msg = " mundo " ;
+int i ;
+for ( i = 0 ; i < strlen ( msg ) ; i ++ ) {
+printf ( " %c " , msg [ i ]) ;
+fflush ( stdout ) ;
+usleep (1000000) ;
+}
+return NULL ;
+}
+int main ( int argc , char * argv []) {
+pthread_t h1 ;
+pthread_t h2 ;
+pthread_create(&h1, NULL , hola , NULL ) ;
+pthread_create (&h2 , NULL , mundo , NULL ) ;
+printf ( "Fin\n " ) ;
 }
