@@ -9,10 +9,11 @@
 
 void *calcularPi(void *UT){
 	//UT: Unidad de trabajo
-	int UTnum = (int ) UT;
-	int count=(50*UTnum);
+	int *UTnum = (int *) UT;
+	int count=50*(*UTnum);
 	double sum = 0;
 	double total;
+
 	for (int i = 0; i < count; ++i){
 		if (i & 0x1)  // Evalua  si el nummero es impar
 		{
@@ -29,29 +30,32 @@ void *calcularPi(void *UT){
 
 int main(){
 
-	int hilos;
-	int UT;
+	int hilos; //cantidad de hilos a asignar
 	int rc;
 
-	std:: cout<< "Ingrese la cantidad de Hilos de trabajo:";
+	std:: cout<< "Ingrese la cantidad de Hilos de trabajo:"; //Pedir al usuario la camtidad
 	std:: cin >> hilos;
 	std:: cout << "\n";
 
 	pthread_t threads[hilos]; // Vector de las variables tipo thread
-	int UT[hilos]
+	int UT[hilos];
 
 	for (int i = 0; i < hilos; ++i){
 
-		std:: cout<< "Ingrese la cantidad de unidades de trabajo:";
-		std:: cin >> UT;
+		std:: cout<< "Ingrese la cantidad de unidades de trabajo:"; //cantidad de unidadades de trabajo al usuario
+		std:: cin >> UT[i];
 		std:: cout << "\n";
-		rc = pthread_create(&threads[i], NULL, calcularPi,(void *)&UT);
-      
+		
+	}
+
+	for (int i = 0; i < hilos; ++i)
+	{
+		rc = pthread_create(&threads[i], NULL, calcularPi,(void *)&UT[i]);
+ 
       if (rc) {
          std:: cout << "Error:unable to create thread," << rc << "\n";
          exit(-1);
 		}
-		
 	}
 
 	for (int i = 0; i < hilos; ++i)
