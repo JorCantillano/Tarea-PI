@@ -6,15 +6,21 @@
 #include <iomanip>
 #include <string.h>
 #include <pthread.h>
+#include <ncurses.h>
 
+struct parametros {
+		int UT;
+		int hilo;
+	};
 
 // Funcion que calcula pi con Serie de Taylor
 
 void *calcularPi(void *UT){		//UT: Unidad de trabajo
-	int *UTnum = (int *) UT;
-	int count=50*(*UTnum);
+	struct parametros *UTnum = (struct parametros *) UT;
+	int count=50*(UTnum->UT);
 	double sum = 0;
 	double total;
+
 
 	
 	// Expresion para el calculo segun serie de Taylor
@@ -26,17 +32,22 @@ void *calcularPi(void *UT){		//UT: Unidad de trabajo
 		else{			// Evalua si el numero es par
 			sum += 1.0/(2*i+1);
 		}
-
+		//sum = 4*sum;	
+		//printw("34.32 \n");
+	
 	}
 	total= sum*4;
-	std:: cout<<"El valor de PI es:"<<std::setprecision(15)<<total<<"\n";
-}
+	std:: cout<<"El valor de PI es:"<<std::setprecision(15)<<total<<" Hilo:"<<UTnum->hilo<<"\n";
+	}
+
+
 
 
 int main(){
 
 	int hilos; 	// variable que almacena la cantidad de hilos
 	int rc;		//
+	char c;
     std:: cout << "\n";
 	std:: cout << "\n";
 	std:: cout << "Calculo de pi en varios THREADS con diferentes unidades de trabajo";
@@ -47,6 +58,7 @@ int main(){
 
 	pthread_t threads[hilos]; 	// Vector de las variables tipo thread (Array de hilos)
 	int UT[hilos];				// Array de unidades de trabajo por cada hilo.
+	struct parametros P[hilos];
 
 	// Ciclo que guarda los UT de cada hilo
 	for (int i = 0; i < hilos; ++i){
@@ -56,11 +68,17 @@ int main(){
 		std:: cout << "\n";
 		
 	}
-
+	for (int i = 0; i < hilos; ++i) //Ciclo Asignador de parametros
+	{
+		P[i].UT= UT[i];
+		P[i].hilo= i;
+	}
+		//initscr();
+		//cbreak();
 	// Ciclo creador de hilos
 	for (int i = 0; i < hilos; ++i)
 	{
-		rc = pthread_create(&threads[i], NULL, calcularPi,(void *)&UT[i]); //pthread argumentos (puntero hilos, Null, funcion, parametros para funcion)
+		rc = pthread_create(&threads[i], NULL, calcularPi,(void *)&P[i]); //pthread argumentos (puntero hilos, Null, funcion, parametros para funcion)
  
       if (rc) {
          std:: cout << "Error:unable to create thread," << rc << "\n";
@@ -74,6 +92,11 @@ int main(){
 	pthread_join(threads[i],NULL);		//pthread_join Argumentos (hilos, status)
 	}
 
+/*c = getch();
+if (c==KEY_F(6))
+{
+	endwin();	
+}*/
 
 	
 	return 0;

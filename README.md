@@ -28,5 +28,9 @@ Ejecutar:
 ./nombre_compilador
 ```
 
+Instalar Curses: sudo apt-get install libncurses5-dev
+
+Copilar Programa: g++ main.cpp -o main -lpthread -fpermissive -lncurses
+
 
 
