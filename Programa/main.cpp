@@ -63,7 +63,7 @@ int main(){
 	// Ciclo que guarda los UT de cada hilo
 	for (int i = 0; i < hilos; ++i){
 
-		std:: cout<< "Ingrese la cantidad de unidades de trabajo:"; //cantidad de unidades de trabajo
+		std:: cout<< "Ingrese la cantidad de unidades de trabajo para el hilo "<<i<<":"; //cantidad de unidades de trabajo
 		std:: cin >> UT[i];		//se va guardando la UT de cada hilo en el array UT[]
 		std:: cout << "\n";
 		
