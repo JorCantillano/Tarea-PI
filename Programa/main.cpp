@@ -8,21 +8,24 @@
 #include <pthread.h>
 #include <ncurses.h>
 
+
 struct parametros {
 		int UT;
 		int hilo;
+		int num_hilos;
+
 	};
 
 // Funcion que calcula pi con Serie de Taylor
 
 void *calcularPi(void *UT){		//UT: Unidad de trabajo
-	struct parametros *UTnum = (struct parametros *) UT;
-	int count=50*(UTnum->UT);
+	struct parametros *UTnum = (struct parametros *) UT;	// Conversion de tipo void a int
+	int count = 50*(UTnum->UT);
 	double sum = 0;
 	double total;
 
+	int h = UTnum->num_hilos;	//total de hilos
 
-	
 	// Expresion para el calculo segun serie de Taylor
 	for (int i = 0; i < count; ++i){
 		if (i & 0x1)	// Evalua  si el numero es impar
@@ -37,7 +40,8 @@ void *calcularPi(void *UT){		//UT: Unidad de trabajo
 	
 	}
 	total= sum*4;
-	std:: cout<<"El valor de PI es:"<<std::setprecision(15)<<total<<" Hilo:"<<UTnum->hilo<<"\n";
+	//std:: cout<<"Hilo "<<UTnum->hilo<<" PI: "<<std::setprecision(15)<<total<<"\n";
+	std:: cout<<"Hilo "<<UTnum->hilo<<" "<<std::setprecision(15)<<total<<"\n";
 	}
 
 
@@ -72,9 +76,12 @@ int main(){
 	{
 		P[i].UT= UT[i];
 		P[i].hilo= i;
+		P[i].num_hilos=hilos;
 	}
+
 		//initscr();
 		//cbreak();
+
 	// Ciclo creador de hilos
 	for (int i = 0; i < hilos; ++i)
 	{
@@ -101,3 +108,6 @@ if (c==KEY_F(6))
 	
 	return 0;
 }
+
+// g++ main.cpp -o main.exe -lpthread -fpermissive -lncurses
+// ./ main.exe
