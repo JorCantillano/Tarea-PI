@@ -10,7 +10,6 @@
 #include <vector>
 
 std::vector<double> resultados; 
-std::vector<int> porcen; 
 
 struct parametros {
 		int UT;
@@ -18,6 +17,7 @@ struct parametros {
 	};
 
 // Funcion que calcula pi con Serie de Taylor
+int calcularPi2 (void )
 
 void *calcularPi(void *P){		//UT: Unidad de trabajo
 	struct parametros *arg = (struct parametros *) P;
@@ -26,7 +26,7 @@ void *calcularPi(void *P){		//UT: Unidad de trabajo
 	double total;
 
 
-	
+	double PI= calcularPi2(UT)
 	// Expresion para el calculo segun serie de Taylor
 	for (int i = 0; i < count; ++i){
 		if (i & 0x1)	// Evalua  si el numero es impar
@@ -37,43 +37,19 @@ void *calcularPi(void *P){		//UT: Unidad de trabajo
 			sum += 1.0/(2*i+1);
 		}
 	total= sum*4;
-	float itr = (int)i;
-	float countd= (int)countd;
 	resultados[arg->hilo]=total;
-	porcen[arg->hilo]= round(((itr)/count)*100);
+	mvprintw(arg->hilo,0,"El valor de PI es:%f para el hilo %d",total,arg->hilo);
+	refresh();
 	}
 	//std:: cout<<"El valor de PI es:"<<std::setprecision(15)<<total<<" del hilo:"<<arg->hilo<<"\n";
 	}
-void *imprimir(void *hil){
-	int *hilos= (int *)hil;
-	int ch;
-initscr();			//Start curses mode 		
-	cbreak();	
-	keypad(stdscr, TRUE);	
-	noecho();
-	printw("Press F6 to exit");
-	refresh();
-	while(true){
 
-		for (int i = 0; i < *hilos; ++i)
-		{
-			mvprintw(i,0,"El valor de PI es:%15.10f para el hilo %d estado de tarea:%d %c",resultados[i],i,porcen[i],'%');
-			refresh();
-			//sleep(1);
-		}
-		/*if ((ch = getch()) == KEY_F(6))
-			{	
-				endwin();
-				break;
-			}*/
-	}
-
-}
 
 int main(){
 
 	int hilos; 	// variable que almacena la cantidad de hilos
 	int rc;		//
+	int ch;
     std:: cout << "\n";
 	std:: cout << "\n";
 	std:: cout << "Calculo de pi en varios THREADS con diferentes unidades de trabajo";
@@ -82,12 +58,10 @@ int main(){
 	std:: cin >> hilos;			// Variable donde se guarda el # de hilos
 	std:: cout << "\n";
 
-	pthread_t threads[hilos];
-	pthread_t imp; 	// Vector de las variables tipo thread (Array de hilos)
+	pthread_t threads[hilos]; 	// Vector de las variables tipo thread (Array de hilos)
 	int UT[hilos];				// Array de unidades de trabajo por cada hilo.
 	struct parametros P[hilos];
 	resultados.reserve(hilos);
-	porcen.reserve(hilos);
 
 	// Ciclo que guarda los UT de cada hilo
 	for (int i = 0; i < hilos; ++i){
@@ -97,11 +71,6 @@ int main(){
 		std:: cout << "\n";
 		
 	}
-
-	pthread_create(&imp,NULL,imprimir,(void *)&hilos);
-
-
-
 	for (int i = 0; i < hilos; ++i) //Ciclo Asignador de parametros
 	{
 		P[i].UT= UT[i];
@@ -125,9 +94,26 @@ int main(){
 	{
 	pthread_join(threads[i],NULL);		//pthread_join Argumentos (hilos, status)
 	}
-	pthread_join(imp,NULL);
 
-	
+	initscr();			//Start curses mode 		
+	cbreak();	
+	keypad(stdscr, TRUE);	
+	noecho();
+	printw("Press F6 to exit");
+	refresh();
+	while(true){
+
+		/*for (int i = 0; i < hilos; ++i)
+		{
+			mvprintw(i,0,"El valor de PI es:%f para el hilo %d",resultados[i],i);
+		}*/
+		if ((ch = getch()) == KEY_F(6))
+			{	
+				endwin();
+				break;
+			}
+		refresh();
+	}
 
 
 	/*for (int i = 0; i < hilos; ++i)
