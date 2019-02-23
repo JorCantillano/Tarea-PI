@@ -2,15 +2,18 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstdlib>
-#include <math.h>
+#include <atomic>
 #include <iomanip>
 #include <string.h>
 #include <pthread.h>
 #include <ncurses.h>
 #include <vector>
+#include <math.h>
 
 std::vector<double> resultados; 
 std::vector<int> porcen; 
+std::atomic<bool> flag_th{true};
+std::vector<int> finish;
 
 struct parametros {
 		int UT;
@@ -21,52 +24,80 @@ struct parametros {
 
 void *calcularPi(void *P){		//UT: Unidad de trabajo
 	struct parametros *arg = (struct parametros *) P;
-	int count=50*(arg->UT);
+	int count=abs(50*(arg->UT));
 	double sum = 0;
 	double total;
+	int i=0;
+
+	while(finish[arg->hilo]==0){
+		// Expresion para el calculo segun serie de Taylor
+		if(flag_th){
+			if (i & 0x1){	// Evalua  si el numero es impar
+				sum += -1.0/(2*i+1);
+			}
+			else{			// Evalua si el numero es par
+				sum += 1.0/(2*i+1);
+			}
+			total= sum*4;
+			i=i+1;
+			float itr = (int)i;
+			float countd= (int)countd;
+			resultados[arg->hilo]=total;
+			porcen[arg->hilo]= round(((itr)/count)*100);
+			if(i==count) finish[arg->hilo]=1;
+		}
+	}
+	 pthread_exit(NULL);
+	}
 
 
-	
-	// Expresion para el calculo segun serie de Taylor
-	for (int i = 0; i < count; ++i){
-		if (i & 0x1)	// Evalua  si el numero es impar
-		{
-			sum += -1.0/(2*i+1);
-		}
-		else{			// Evalua si el numero es par
-			sum += 1.0/(2*i+1);
-		}
-	total= sum*4;
-	float itr = (int)i;
-	float countd= (int)countd;
-	resultados[arg->hilo]=total;
-	porcen[arg->hilo]= round(((itr)/count)*100);
-	}
-	//std:: cout<<"El valor de PI es:"<<std::setprecision(15)<<total<<" del hilo:"<<arg->hilo<<"\n";
-	}
 void *imprimir(void *hil){
 	int *hilos= (int *)hil;
-	int ch;
-initscr();			//Start curses mode 		
+	char ch;
+	int varmenu=1;
+	int varmenu1=1;
+	initscr();			//Start curses mode 		
 	cbreak();	
-	keypad(stdscr, TRUE);	
+	keypad(stdscr, TRUE);
+	scrollok(stdscr, TRUE);
+    nodelay(stdscr, TRUE);	
 	noecho();
-	printw("Press F6 to exit");
+	printw("Press o to pause and option");
 	refresh();
-	while(true){
+	while(varmenu1==1){
+		if (getch() =='o'){	
+			flag_th=false;
 
-		for (int i = 0; i < *hilos; ++i)
+			while(varmenu==1){
+					mvprintw(1,0,"Press s to exit or press p to play");
+					ch=getch();
+					if(ch=='s') {
+						varmenu1=0;
+						varmenu=0;
+						for (int i = 0; i < *hilos; ++i){
+							finish[i]=1;
+						}
+					
+					}
+					else if(ch=='p'){ 
+						varmenu=0;
+						flag_th = true;
+					}
+				}
+			}
+			varmenu=1;
+			mvprintw(1,0,"\n");
+			refresh();
+
+		for (int i = 2; i < *hilos+2; ++i)
 		{
-			mvprintw(i,0,"El valor de PI es:%15.10f para el hilo %d estado de tarea:%d %c",resultados[i],i,porcen[i],'%');
+			mvprintw(i,0,"El valor de PI es:%.*f para el hilo %d estado de tarea:%d%c",resultados[i-2],15,i-1,porcen[i-2],'%');
 			refresh();
 			//sleep(1);
 		}
-		/*if ((ch = getch()) == KEY_F(6))
-			{	
-				endwin();
-				break;
-			}*/
 	}
+	endwin();
+	
 
 }
 
@@ -88,11 +119,12 @@ int main(){
 	struct parametros P[hilos];
 	resultados.reserve(hilos);
 	porcen.reserve(hilos);
+	finish.reserve(hilos);
 
 	// Ciclo que guarda los UT de cada hilo
 	for (int i = 0; i < hilos; ++i){
 
-		std:: cout<< "Ingrese la cantidad de unidades de trabajo para el hilo "<<i<<":"; //cantidad de unidades de trabajo
+		std:: cout<< "Ingrese la cantidad de unidades de trabajo para el hilo "<<i+1<<":"; //cantidad de unidades de trabajo
 		std:: cin >> UT[i];		//se va guardando la UT de cada hilo en el array UT[]
 		std:: cout << "\n";
 		
@@ -126,15 +158,6 @@ int main(){
 	pthread_join(threads[i],NULL);		//pthread_join Argumentos (hilos, status)
 	}
 	pthread_join(imp,NULL);
-
-	
-
-
-	/*for (int i = 0; i < hilos; ++i)
-	{
-	std:: cout<<"El valor de PI es:"<<std::setprecision(15)<<resultados[i]<<" del hilo:"<<i<<"\n";
-	}
-	std::cin>>ch;*/
 
 
 

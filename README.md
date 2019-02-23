@@ -30,7 +30,9 @@ Ejecutar:
 
 Instalar Curses: sudo apt-get install libncurses5-dev
 
-Copilar Programa: g++ main.cpp -o main -lpthread -fpermissive -lncurses
+Copilar Programa main: g++ main.cpp -o main -lpthread -lncurses
+
+Ejejcutar el programa: ./main
 
 
 
